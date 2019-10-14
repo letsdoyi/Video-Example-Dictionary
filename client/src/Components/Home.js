@@ -6,25 +6,24 @@ import './Common.scss';
 import axios from 'axios';
 
 function Home(props) {
-  const $App = document.querySelector('.App');
-  console.log('$App', $App);
+  const { isLoggedIn, userInfo } = props;
+  let $Home = document.querySelector('.Home');
+  console.log('$App', );
+
+  useEffect(() => {
+  }, [])
 
   function handleControlClick() {
-    $App.classList.toggle('search-active');
+    $Home.classList.toggle('search-active');
   }
 
   function handleCloseClick() {
-    $App.classList.toggle('search-active');
+    $Home.classList.toggle('search-active');
   }
 
   return (
     <div className="Home">
-      <div className="search-bar-container">
-        <form>
-          <FontAwesomeIcon className="search-icon" icon={faSearch} />
-          <input className="search-bar"></input>
-        </form>
-      </div>
+      <div>Find words, Enjoy Youtube</div>
 
       {/* //page content + floating button */}
       <div className="container p-y-md">
@@ -46,11 +45,11 @@ function Home(props) {
       />
       <div className="search-input">
         <form>
-          <input
+          {/* <input
             className="input-search"
             placeholder="Start Typing"
             type="text"
-          />
+          /> */}
           <div className="search-option-list">
             <h1>LANGUAGE</h1>
             <ul>
@@ -91,10 +90,6 @@ function Home(props) {
           allow="autoplay"
         ></iframe>
       </div>
-
-      <a href="http://localhost:4000/api/auth/google/logout">
-        구글 로그아웃
-      </a>
     </div>
   );
 }
