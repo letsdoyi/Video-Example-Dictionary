@@ -1,12 +1,16 @@
-// const createError = require('http-errors');
+const createError = require('http-errors');
 const express = require('express');
+const cors = require('cors');
+const session = require('express-session');
+const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
-// const cookieParser = require('cookie-parser');
+const keys = require('./config/keys');
+const cookieParser = require('cookie-parser');
 // const logger = require('morgan');
 
-// Setup Dotenv
+// Connect Dotenv
 if (process.env.NODE_ENV === 'development') {
   const dotenv = require('dotenv');
   dotenv.config({
@@ -32,18 +36,42 @@ db.once('open', function() {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// Setup body-parer
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// app.use(logger('dev'));
+// Middlewares
+app.use(
+  cookieSession({
+    maxAge: 24 * 60 * 60 * 1000,
+    keys: [keys.session.cookieKey],
+  }),
+);
+app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: 'cats',
+    resave: true,
+    saveUninitialized: true,
+  }),
+);
+console.log('session실행중');
+app.use(
+  cors({
+    origin: "http://localhost:3000", // allow to server to accept request from different origin
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true // allow session cookie from browser to pass through
+  })
+);
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.urlencoded({ extended: false }));
+
+const passport = require('./lib/passport')(app);
+
+app.use(cookieParser());
+// app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
+app.use('/api/auth', require('./routes/auth'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
