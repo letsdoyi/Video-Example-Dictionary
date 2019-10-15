@@ -6,7 +6,7 @@ const { CLIENT_URL, GOOGLE_API_SCOPE_PLUS } = require('../constants');
 router.get(
   '/google',
   passport.authenticate('google', {
-    scope: [ GOOGLE_API_SCOPE_PLUS ],
+    scope: [GOOGLE_API_SCOPE_PLUS],
   }),
 );
 
