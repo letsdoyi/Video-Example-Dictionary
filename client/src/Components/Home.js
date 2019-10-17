@@ -1,58 +1,153 @@
 import React, { useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
+import Popup from '../Components/Popup';
 import './Home.scss';
 import './Common.scss';
+import CONSTANTS from '../Constants/common';
 
 function Home(props) {
-  let $Home = document.querySelector('.Home');
-  console.log('$App');
-
-  useEffect(() => {}, []);
-
-  function handleControlClick() {
-    $Home.classList.toggle('search-active');
-  }
-
-  function handleCloseClick() {
-    $Home.classList.toggle('search-active');
-  }
+  const { selected, onRadioChange, onCheckboxChange, onTextChange, onSearchSubmit } = props;
+  const { SELECTION } = CONSTANTS;
 
   return (
     <div className="Home">
       <div className="headline">Search words, Enjoy reality</div>
-      <form className="search-form">
+
+      <form
+        className="search-form"
+        onSubmit = {(ev) => { onSearchSubmit(ev) }}
+      >
         <div className="input-search-wrapper">
           <input
+            onChange={ev => {
+              onTextChange(ev);
+            }}
             className="input-search"
             placeholder="Start Typing"
             type="text"
           />
+
+          <input className="input-search" type="submit" />
         </div>
 
         <div className="search-option-list-container">
           <div className="search-option-list language-wrapper">
-            <h1>LANGUAGE</h1>
-            <ul className="list language-list">
-              <li>ENGLISH</li>
-              <li>KOREAN</li>
-              <li>ARABIC</li>
-            </ul>
+            <div className="list language-list">
+              <label>
+                ENGLISH
+                <input
+                  onChange={ev => {
+                    onRadioChange(ev);
+                  }}
+                  type="radio"
+                  id="ENGLISH"
+                  value="en"
+                  name="language"
+                  checked={'en' === selected.language}
+                />
+              </label>
+              <label>
+                KOREAN
+                <input
+                  onChange={ev => {
+                    onRadioChange(ev);
+                  }}
+                  type="radio"
+                  id="korean"
+                  value="ko"
+                  name="language"
+                  checked={'ko' === selected.language}
+                />
+              </label>
+
+              <label>
+                ARABIC
+                <input
+                  onChange={ev => {
+                    onRadioChange(ev);
+                  }}
+                  type="radio"
+                  id="arabic"
+                  value="ar"
+                  name="language"
+                  checked={'ar' === selected.language}
+                />
+              </label>
+            </div>
           </div>
+
           <div className="search-option-list categories-wrapper">
-            <h1>CATEGORIES</h1>
-            <ul className="list categories-list">
-              <li>NEWS</li>
-              <li>LECTURE</li>
-              <li>DOCUMENTARY</li>
-              <li>VLOG</li>
-              <li>ENTERTANINMENT</li>
-              <li>TEENAGERS</li>
-              <li>KIDS</li>
-              <li>ADVERTISEMENT</li>
-              <li>GAMES</li>
-            </ul>
+            <h1>CATEGORIES - 3 Selections Only</h1>
+            <div className="list categories-list">
+              <label>
+                COMEDY
+                <input
+                  onChange={ev => {
+                    onCheckboxChange(ev, 'CATEGORY');
+                  }}
+                  type="checkbox"
+                  id="comedy"
+                  value="comedy"
+                  name="category"
+                  checked={selected.categories.includes('comedy')}
+                />
+              </label>
+              <label>
+                FILM
+                <input
+                  onChange={ev => {
+                    onCheckboxChange(ev, 'CATEGORY');
+                  }}
+                  type="checkbox"
+                  id="film"
+                  value="film"
+                  name="category"
+                  checked={selected.categories.includes('film')}
+                />
+              </label>
+              <label>
+                ENTERTANINMENT
+                <input
+                  onChange={ev => {
+                    onCheckboxChange(ev, 'CATEGORY');
+                  }}
+                  type="checkbox"
+                  id="entertainment"
+                  value="entertainment"
+                  name="category"
+                  checked={selected.categories.includes(
+                    'entertainment',
+                  )}
+                />
+              </label>
+              <label>
+                TECH
+                <input
+                  onChange={ev => {
+                    onCheckboxChange(ev, 'CATEGORY');
+                  }}
+                  type="checkbox"
+                  id="tech"
+                  value="tech"
+                  name="category"
+                  checked={selected.categories.includes('tech')}
+                />
+              </label>
+              <label>
+                TALK
+                <input
+                  onChange={ev => {
+                    onCheckboxChange(ev, 'CATEGORY');
+                  }}
+                  type="checkbox"
+                  id="talk"
+                  value="talk"
+                  name="category"
+                  checked={selected.categories.includes('talk')}
+                />
+              </label>
+            </div>
           </div>
+
           <div className="search-option-list recommendation-wrapper">
             <h1>RECOMMENDATION</h1>
             <ul className="list recommendation-list">
