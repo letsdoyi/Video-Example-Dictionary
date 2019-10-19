@@ -1,0 +1,20 @@
+.captions {
+  width: 500px;
+  border: 1px solid gray;
+
+  .captions-title {
+    margin: 20px;
+  }
+  .captions-wrapper {
+    height: 500px;
+
+    overflow-y: scroll;
+  }
+  .caption-container {
+    height: 30px;
+  }
+  .caption-content {
+    margin-left: 20px;
+    line-height: 30px;
+  }
+}
