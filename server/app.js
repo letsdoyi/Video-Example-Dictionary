@@ -55,23 +55,27 @@ app.use(
 console.log('session실행중');
 app.use(
   cors({
-    origin: "http://localhost:3000", // allow to server to accept request from different origin
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true // allow session cookie from browser to pass through
-  })
+    origin: 'http://localhost:3000', // allow to server to accept request from different origin
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // allow session cookie from browser to pass through
+  }),
 );
 app.use(express.json());
 // app.use(express.urlencoded({ extended: false }));
 
 const passport = require('./lib/passport')(app);
+const youtube = require('./lib/youtube');
 
 app.use(cookieParser());
 // app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Routes
 app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/videos', require('./routes/videos'));
+app.use('/api/dictionary', require('./routes/dictionary'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
