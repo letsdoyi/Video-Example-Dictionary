@@ -20,14 +20,16 @@ function App(props) {
     getVideoData,
     getDictionaryData,
     myWords,
+    updateMyWords,
     userInfo,
     isLoggedIn,
+
   } = props;
 
   useEffect(props => {
-    //requestLoginData
 
     const fetchLoginData = async () => {
+      console.log('유저 가져오기');
       const response = await axios.get(REQUEST_URL.LOGIN_SUCCESS, {
         withCredentials: 'include',
         headers: {
@@ -37,8 +39,14 @@ function App(props) {
         },
       });
       console.log(response);
-      if (response.data.user) {
-        getUserData(response.data.user);
+      const user = response.data.user;
+      if (user) {
+        getUserData(user);
+        console.log('유저 결과 확인:', user);
+        const myWordsKeys = Object.keys(user.my_words);
+        myWordsKeys.forEach((wordKey)=>{
+          updateMyWords(user.my_words[wordKey], 'add');
+        });
       }
     };
     fetchLoginData();
@@ -131,6 +139,27 @@ function App(props) {
     };
     requestPostAddedWord();
   }
+
+  if (request.isReadyToDeleteWord.value) {
+    console.log('삭제 요청 보낼 데이터:', userInfo.google_id);
+    let word = request.isReadyToDeleteWord.target;
+    console.log(word);
+    const requestDeleteWord = async () => {
+      const deleteMyWordResponse = await axios.delete(
+        REQUEST_URL.DELETE_WORD,
+        {
+          data: {
+            google_id: userInfo.google_id,
+            word,
+          }
+        },
+      );
+      console.log('deleteMyWordResponse:', deleteMyWordResponse);
+    };
+    requestDeleteWord();
+  }
+
+
 
   return (
     <div className="App">
