@@ -5,20 +5,38 @@ const User = require('../models/User');
 router.post('/', async (req, res, next) => {
   const { google_id, myWords } = req.body;
   try {
-    User.findOne({ google_id: google_id }, (err, doc) => {
-      if (err) {
-        throw new Error(err);
-      }
-      if (doc.my_words) {
-        doc.my_words = myWords;
-      } else {
-        Object.assign(doc.my_words, myWords);
-      }
-      doc.save();
-    });
+    const user = await User.findOne({ google_id: google_id });
+    user.my_words = {
+      ...user.my_words,
+      ...myWords,
+    };
+    await user.save();
 
     res.status(200).json({
       result: 'ok',
+      message: 'my_words is successfully updated.',
+    });
+  } catch (err) {
+    throw new Error(err);
+  }
+});
+
+router.delete('/', async (req, res, next) => {
+  const { google_id, word } = req.body;
+  try {
+    //시간될 때 고치기
+    const user = await User.findOne({ google_id: google_id });
+    const userDoc = JSON.parse(JSON.stringify(user._doc));
+    delete userDoc.my_words[word];
+
+    await User.findByIdAndUpdate(
+      { _id: userDoc._id },
+      { my_words: userDoc.my_words },
+    );
+
+    res.status(200).json({
+      result: 'ok',
+      message: `my_words is successfully deleted.`,
     });
   } catch (err) {
     throw new Error(err);
