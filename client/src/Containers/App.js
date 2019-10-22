@@ -9,7 +9,8 @@ const mapStateToProps = state => {
     request: state.request,
     videos: state.videos,
     videoState: state.videoState,
-    dictionary: state.dictionary
+    dictionary: state.dictionary,
+    myWords: state.myWords
   };
 };
 
@@ -46,6 +47,10 @@ const mapDispatchToProps = dispatch => {
       dispatch({ type: 'REQUEST_VIDEOS' });
       ev.preventDefault();
     },
+    onAddWordClick: function(word, myWords) {
+      dispatch({ type: 'REQUEST_POST_WORD',
+      data: {word, myWords}});
+    },
     updateStartTimeTo: function(time, duration) {
       dispatch({
         type: 'MOVE_VIDEO_START_TIME',
@@ -58,6 +63,12 @@ const mapDispatchToProps = dispatch => {
         data: currentValue,
       });
     },
+    updateMyWords: function (word) {
+      dispatch({
+        type: 'ADD_WORD',
+        data: word,
+      });
+    }
   };
 };
 

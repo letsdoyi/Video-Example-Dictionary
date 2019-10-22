@@ -4,6 +4,7 @@ import Login from '../Components/Login';
 import Header from '../Components/Header';
 import Home from '../Components/Home';
 import Videos from '../Components/Videos';
+import MyWords from '../Components/MyWords';
 import axios from 'axios';
 import secondsConverter from 'seconds-converter';
 import { oneToTwoDigits } from '../Utility';
@@ -18,6 +19,9 @@ function App(props) {
     getUserData,
     getVideoData,
     getDictionaryData,
+    myWords,
+    userInfo,
+    isLoggedIn,
   } = props;
 
   useEffect(props => {
@@ -75,7 +79,7 @@ function App(props) {
           videoInfo.captions.forEach(caption => {
             const startTime = Math.floor(Number(caption.start));
             const time = secondsConverter(startTime, 'sec');
-            console.log(time);
+            // console.log(time);
             const mins = oneToTwoDigits(
               time.hours / 60 + time.minutes,
             );
@@ -99,8 +103,11 @@ function App(props) {
             word: selected.word,
           },
         );
-        console.log('사전 결과:', postDictionaryResponse.data.dictionary);
-        let dictionary = postDictionaryResponse.data.dictionary
+        console.log(
+          '사전 결과:',
+          postDictionaryResponse.data.dictionary,
+        );
+        let dictionary = postDictionaryResponse.data.dictionary;
         getDictionaryData(dictionary);
       } else {
         console.log('selected word is not valid');
@@ -109,23 +116,21 @@ function App(props) {
     requestDictionaryData();
   }
 
-  // const fetchDictionaryData = async () => {
-  //   console.log('fetchDictionary Data실행');
-  //   const getDictionaryResponse = await axios.get(
-  //     REQUEST_URL.GET_DICTIONARY_SUCCESS,
-  //     {
-  //       headers: {
-  //         Accept: 'application/json',
-  //         'Content-Type': 'application/json',
-  //         'Access-Control-Allow-Credentials': true,
-  //       },
-  //     },
-  //   );
-  //   console.log('사전 결과:', getDictionaryResponse);
-
-  //   getDictionaryData(getDictionaryResponse.result);
-  // };
-  // fetchDictionaryData();
+  if (request.isReadyToPostWord) {
+    console.log('post 요청 myWords:', myWords);
+    console.log('요청 보낼 데이터:', userInfo.google_id, myWords);
+    const requestPostAddedWord = async () => {
+      const postMyWordResponse = await axios.post(
+        REQUEST_URL.POST_ADDED_WORD,
+        {
+          google_id: userInfo.google_id,
+          myWords,
+        },
+      );
+      console.log('postMyWordResponse:', postMyWordResponse);
+    };
+    requestPostAddedWord();
+  }
 
   return (
     <div className="App">
@@ -142,9 +147,14 @@ function App(props) {
       />
       <Route exact path="/login" render={() => <Login />} />
       <Route
-        exact
         path="/videos"
-        render={() => <Videos {...props} />}
+        render={renderProps => <Videos {...props} {...renderProps} />}
+      />
+      <Route
+        path="/myWords"
+        render={renderProps => (
+          <MyWords {...props} {...renderProps} />
+        )}
       />
     </div>
   );
