@@ -76,6 +76,7 @@ app.use('/users', require('./routes/users'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/videos', require('./routes/videos'));
 app.use('/api/dictionary', require('./routes/dictionary'));
+app.use('/api/myWords', require('./routes/myWords'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
