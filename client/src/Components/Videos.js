@@ -1,27 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import Youtube from 'react-youtube';
-import { dividedTimeToOne } from '../Utility';
+import Dictionary from '../Components/Dictionary';
 import loader from '../Images/loader3.gif';
 import Button from '@material-ui/core/Button';
+import Switch from '@material-ui/core/Switch';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import './Common.scss';
 import './Videos.scss';
-import Dictionary from '../Components/Dictionary';
-
-import Switch from '@material-ui/core/Switch';
 
 function Videos(props) {
-  console.log('videos props:', props);
   const {
     videos,
     videoState,
     dictionary,
     updateStartTimeTo,
     updateCurrentTo,
+    updateCurrentTimeTo,
     updateVideoOrder,
-    onLoadVideoData,
-    request,
   } = props;
   let captions;
   let videoId;
@@ -29,7 +25,9 @@ function Videos(props) {
   let startIndex;
   let firstStartTime;
   let firstDuration;
-  let timers = [];
+  let timer;
+  let timers = []; //랜더링 될때 마다 timers 확인
+  clearTimerArr(timers); //스코프 확인
 
   const [isAddedClass, setIsAddedClass] = useState(false);
   function onSwitchToggle() {
@@ -45,23 +43,37 @@ function Videos(props) {
       );
       firstDuration = Number(videoInfo.captions[startIndex].dur);
       updateStartTimeTo(firstStartTime, firstDuration);
+      updateCurrentTimeTo(firstStartTime);
     }
   }, [videos.info[videoState.order]]);
 
-  if (videos.info[videoState.order]) {
+  if (videos.foundWord && videos.info.length > 0) {
     videoInfo = videos.info[videoState.order];
     videoId = videoInfo.id;
     startIndex = videoInfo.startIndex;
 
     captions = videos.info[videoState.order].captions.map(
       (caption, index) => {
-        const durationMilliseconds = caption.dur;
+        const captionStart = Number(caption.start);
+        const captionDuration = Number(caption.dur);
         let count = 0;
+        const captionClassBox = ['caption-container'];
+        if (index === startIndex) {
+          captionClassBox.push('highlight-pink');
+        }
+        if (
+          captionStart < videoState.currentTime &&
+          videoState.currentTime < captionStart + captionDuration + 0.1
+        ) {
+          captionClassBox.push('highlight-gray');
+        }
+
         return (
           <div
             key={index}
-            className="caption-container"
+            className={captionClassBox.join(' ')}
             onClick={() => {
+              //Prevent from not rendering of the same state
               if (count === 0) {
                 caption.start -= 0.0001;
                 count++;
@@ -69,7 +81,7 @@ function Videos(props) {
                 caption.start += 0.0001;
                 count--;
               }
-              updateStartTimeTo(caption.start, durationMilliseconds);
+              updateStartTimeTo(caption.start, caption.dur);
             }}
           >
             <span className="caption-content start">
@@ -82,67 +94,82 @@ function Videos(props) {
         );
       },
     );
+  } else if (videos.foundWord && videos.info.length === 0) {
+    return (
+      <div className="Videos">
+        <div className="error-no-videos">
+          <div>Cannot find searched word in the categories.</div>
+        </div>
+      </div>
+    );
   } else {
     return (
       <div className="videos-loader">
         <img src={loader} />
-        {dictionary && <Dictionary {...props} />}
       </div>
     );
   }
 
+  //Youtube video options
   const options = {
     playerVars: {
       autoplay: 1,
       start: videoState.startTimeSeconds,
-      end: videoState.startTimeSeconds + videoState.durationMilliseconds / 1000,
+      // end: videoState.startTimeSeconds + videoState.durationMilliseconds / 1000,
       modestbranding: 1,
       loop: 1,
     },
   };
 
-  function onPlayerReady(event) {
-    console.log('onPlayerReady 실행되는지');
+  function clearTimerArr(arr) {
+    arr.forEach(timer => {
+      console.log('timerClear', timer);
+      clearTimeout(timer);
+    });
   }
 
-  function onPlayerPlay(event) {
-    console.log('onPlayerPlay 실행');
+  function onPlayerReady(event) {
+    clearTimerArr(timers);
+    console.log('onPlayerReady 실행되는지');
 
-    updateCurrentTo('play');
-    console.log(event.target.getCurrentTime());
-    // let timer = setTimeout(() => {
-    //   event.target.pauseVideo();
-    // }, videoState.durationMilliseconds);
-    // timers.push(timer);
-    if (videoState.current === 'repeat') {
-      event.target.seekTo(videoState.startTimeSeconds);
-      event.target.playVideo();
-    }
+    //처음 비디오 실행시 타이머 설정
+    timer = setTimeout(() => {
+      event.target.pauseVideo();
+    }, videoState.durationMilliseconds);
+    timers.push(timer);
+    console.log('playerReady의 타이머 콘솔:', timers);
   }
 
   function onPlayerStateChange(event) {
     console.log('onPlayerStateChange 실행');
-    // console.log('event', event.data);
-    // console.log('youtubeState:', Youtube.PlayerState);
+    console.log('onStateChange 타이머 모음 배열:', timers);
+
+    console.log(event.data);
+    //event.data
+    // {0: 종료, 1: 재생, 2:일시중지, 3: 버퍼링}
+    // debugger;
+  }
+
+  function onPlayerPlay(event) {
+    console.log('onPlayerPlay 실행');
+    console.log(event.target.getCurrentTime());
   }
 
   function onPlayerPause(event) {
-    updateCurrentTo('pause');
-    // console.log('onPlayerPause 실행');
-    // timers.forEach(timer => {
-    //   console.log('timerClear', timer);
-    //   clearTimeout(timer);
-    // });
-    // if (videoState.current === 'repeat') {
-    //   event.target.seekTo(videoState.startTimeSeconds);
-    //   event.target.playVideo();
-    // }
+    timer = setTimeout(() => {
+      event.target.pauseVideo();
+    }, videoState.durationMilliseconds);
+    const currentTime = event.target.getCurrentTime();
+    console.log(event.target.getCurrentTime());
+    updateCurrentTimeTo(currentTime);
+    event.target.playVideo();
   }
 
-  const captionsClassBox = ['captions'];
+  // CatpionsContainer size toggle
+  const captionsContainerClassBox = ['captions-container'];
   const captionsWrapperClassBox = ['captions-wrapper'];
   if (isAddedClass) {
-    captionsClassBox.push('foldTo150');
+    captionsContainerClassBox.push('foldTo150');
     captionsWrapperClassBox.push('foldTo70');
   }
 
@@ -150,18 +177,18 @@ function Videos(props) {
     <div className="Videos">
       {dictionary && <Dictionary {...props} />}
       <span className="foundWord">{videos.foundWord}</span>
-      <div className="player-caption-container">
+      <div className="player-and-captions-container">
         <Youtube
           videoId={videoId}
           opts={options}
           onReady={onPlayerReady}
+          onStateChange={onPlayerStateChange}
           onPlay={onPlayerPlay}
-          onPlayerStateChange={onPlayerStateChange}
           onPause={onPlayerPause}
         />
         <div className="player"></div>
 
-        <div className={captionsClassBox.join(' ')}>
+        <div className={captionsContainerClassBox.join(' ')}>
           <div className="caption-title-wrapper">
             <h1 className="captions-title">Transcript</h1>
             <Switch
@@ -171,11 +198,14 @@ function Videos(props) {
               onClick={() => onSwitchToggle()}
             />
           </div>
-
+          {/* caption-title-wrapper */}
           <div className={captionsWrapperClassBox.join(' ')}>
             {captions}
           </div>
+          {/* captionsWrapper */}
         </div>
+        {/* captionsContainerClassBox */}
+
         <div className="video-controller-container">
           <Button
             size="large"
@@ -202,7 +232,9 @@ function Videos(props) {
             <KeyboardArrowRight />
           </Button>
         </div>
+        {/*video-controller-container*/}
       </div>
+      {/*player-and-captions-container*/}
     </div>
   );
 }

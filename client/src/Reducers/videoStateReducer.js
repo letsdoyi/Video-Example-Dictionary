@@ -2,6 +2,7 @@ const initialState = {
   startTimeSeconds: 0,
   durationMilliseconds: 100000,
   current: 'play',
+  currentTime: 0,
   order: 0,
 };
 
@@ -18,6 +19,12 @@ function videoStateReducer(state = initialState, action) {
       return {
         ...state,
         current: action.data,
+      };
+
+    case 'UPDATE_CURRENT_TIME':
+      return {
+        ...state,
+        currentTime: action.data,
       };
 
     case 'UPDATE_VIDEO_ORDER':

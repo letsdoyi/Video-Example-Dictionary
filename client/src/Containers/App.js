@@ -10,7 +10,7 @@ const mapStateToProps = state => {
     videos: state.videos,
     videoState: state.videoState,
     dictionary: state.dictionary,
-    myWords: state.myWords
+    myWords: state.myWords,
   };
 };
 
@@ -43,13 +43,25 @@ const mapDispatchToProps = dispatch => {
         data: ev.currentTarget.value,
       });
     },
-    onSearchSubmit: function(ev) {
+    onVideoSearchSubmit: function(ev) {
       dispatch({ type: 'REQUEST_VIDEOS' });
       ev.preventDefault();
     },
+    // onChannelSearchSubmit: function(ev) {
+    //   dispatch({ type: 'REQUEST_CHANNELS' });
+    //   ev.preventDefault();
+    // },
     onAddWordClick: function(word, myWords) {
-      dispatch({ type: 'REQUEST_POST_WORD',
-      data: {word, myWords}});
+      dispatch({
+        type: 'REQUEST_POST_WORD',
+        data: { word, myWords },
+      });
+    },
+    onDeleteWordClick: function(word) {
+      dispatch({
+        type: 'REQUEST_DELETE_WORD',
+        data: word,
+      });
     },
     updateStartTimeTo: function(time, duration) {
       dispatch({
@@ -63,12 +75,27 @@ const mapDispatchToProps = dispatch => {
         data: currentValue,
       });
     },
-    updateMyWords: function (word) {
+    updateCurrentTimeTo: function(crrentTime) {
       dispatch({
-        type: 'ADD_WORD',
-        data: word,
+        type: 'UPDATE_CURRENT_TIME',
+        data: crrentTime,
       });
-    }
+    },
+    updateVideoOrder: function(difference) {
+      dispatch({
+        type: 'UPDATE_VIDEO_ORDER',
+        data: difference,
+      });
+    },
+    updateMyWords: function(word, type) {
+      switch (type) {
+        case 'remove':
+          dispatch({ type: 'REMOVE_WORD', data: word });
+
+        case 'add':
+          dispatch({ type: 'ADD_WORD', data: word });
+      }
+    },
   };
 };
 
