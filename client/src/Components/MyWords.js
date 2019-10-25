@@ -1,41 +1,59 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import Modal from './Modal';
 import './Common.scss';
-import './Popup.scss';
+import './MyWords.scss';
 
 function MyWords(props) {
-  const { myWords, updateMyWords, onDeleteWordClick } = props;
+  const {
+    myWords,
+    updateMyWords,
+    onDeleteWordClick,
+    onReadyModal,
+    isReadyToShowModal,
+    UpdateModalMessage,
+  } = props;
+  console.log(props);
 
-  const myWordsKeys = Object.keys(myWords);
+  let myWordsKeys = Object.keys(myWords);
   let myWordList;
   let resultsList;
 
+  debugger;
   if (myWordsKeys.indexOf('undefined') !== -1) {
-    return myWordsKeys.filter(key => {
+    myWordsKeys = myWordsKeys.filter(key => {
       return key !== 'undefined';
     });
   }
   if (myWordsKeys.length) {
     myWordList = myWordsKeys.map(key => {
-      resultsList = myWords[key]['results'].map(result => {
+      resultsList = myWords[key]['results'].map((result, index) => {
+        const partOfSpeech = result['partOfSpeech'];
         return (
-          <div className="resultsList">
-            <div>{result['partOfSpeech']}</div>
-            <div>{result['definition']}</div>
+          <div key={index} className="results-List">
+            <div className="definition">- {result['definition']}</div>
           </div>
         );
       });
       return (
         <div className="word-wrapper">
-          <RemoveCircleIcon
-            onClick={ev => {
-              debugger;
-              handleRemoveButtonClick(ev, key);
-            }}
-          />
-          <div>{myWords[key]['results'][0]['partOfSpeech']}</div>
-          <div>{myWords[key]['word']}</div>
-          <div>{myWords[key]['pronunciation']['all']}</div>
+          <div className="word-headline">
+            <RemoveCircleIcon
+              className="remove-circle-icon"
+              onClick={ev => {
+                onReadyModal();
+                handleRemoveButtonClick(ev, key);
+                UpdateModalMessage('Successfully deleted');
+              }}
+            />
+            <span className="partOfSpeech">
+              {myWords[key]['results'][0]['partOfSpeech']}
+            </span>
+            <span className="word">{myWords[key]['word']}</span>
+            <span className="pronunciation">
+              [{myWords[key]['pronunciation']['all']}]
+            </span>
+          </div>
           {resultsList}
         </div>
       );
@@ -51,9 +69,17 @@ function MyWords(props) {
 
   return (
     <>
-      {myWordList && <div className="MyWords">{myWordList}</div>}
+      {<Modal {...props} />}
+      {myWordList && (
+        <div className="MyWords">
+          <h1>MY WORDS</h1>
+          <div>{myWordList}</div>
+        </div>
+      )}
       {!myWordList && (
-        <div className="MyWords">There is no my word list yet.</div>
+        <div className="MyWords">
+          <div className="noWords">There is no my word list yet.</div>
+        </div>
       )}
     </>
   );

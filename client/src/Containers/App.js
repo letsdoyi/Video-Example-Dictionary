@@ -4,6 +4,8 @@ import App from '../Components/App';
 const mapStateToProps = state => {
   return {
     isLoggedIn: state.isLoggedIn,
+    isReadyToShowModal: state.isReadyToShowModal,
+    modalMessage: state.modalMessage,
     userInfo: state.userInfo,
     selected: state.selected,
     request: state.request,
@@ -95,6 +97,24 @@ const mapDispatchToProps = dispatch => {
         case 'add':
           dispatch({ type: 'ADD_WORD', data: word });
       }
+    },
+    onReadyModal: function(){
+      debugger;
+      dispatch({
+        type: 'READY_TO_SHOW_MODAL',
+      });
+    },
+    onNotReadyModal: function(){
+      debugger;
+      dispatch({
+        type: 'NOT_READY_TO_SHOW_MODAL',
+      });
+    },
+    UpdateModalMessage: function(text){
+      dispatch({
+        type: 'UPDATE_MODAL_MESSAGE',
+        data: text
+      });
     },
   };
 };
