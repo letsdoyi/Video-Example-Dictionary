@@ -149,7 +149,6 @@ async function getSubtitlesBy(word, videoIds, lang = 'en') {
   }
 }
 
-
 // async function getSubtitlesBy(word, videoIds, lang = 'en') {
 //   try {
 //     let videosInfo = videoIds.map(async videoId => {

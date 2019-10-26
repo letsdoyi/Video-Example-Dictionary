@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const { CLIENT_URL, GOOGLE_API_SCOPE_PLUS } = require('../constants');
+const { CLIENT_URL, GOOGLE_API_SCOPE } = require('../constants');
 
 router.get(
   '/google',
   passport.authenticate('google', {
-    scope: [GOOGLE_API_SCOPE_PLUS],
+    scope: [GOOGLE_API_SCOPE.PLUS],
   }),
 );
 
@@ -23,10 +23,12 @@ router.get('/google/login/success', (req, res, next) => {
   console.log('로그인 호출!');
   console.log('유저', req.user);
   if (req.user) {
-    res.json({
+    res.status(200).json({
       result: 'login success',
       user: req.user,
     });
+  } else{
+    res.status(204);
   }
 });
 

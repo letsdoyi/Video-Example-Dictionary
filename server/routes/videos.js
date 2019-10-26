@@ -2,32 +2,35 @@ const express = require('express');
 const router = express.Router();
 const { getTenVideoSubtitlesFromLocalBy } = require('../lib/youtube');
 
-let word;
-let videoInfo;
+let word, videosInfo, pageIndex, categories, language;
 
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
   console.log('비디오 검색 요청', req.body.selected);
-  let pageIndex;
   if (!req.body.selected.pageIndex) {
     pageIndex = 0;
   } else {
     pageIndex = req.body.selected.pageIndex;
   }
-  const { word, categories } = req.body.selected;
-  videoInfo = getTenVideoSubtitlesFromLocalBy(
+  categories = req.body.selected.categories;
+  language = req.body.selected.language;
+  word = req.body.selected.word;
+});
+
+router.get('/success', async (req, res, next) => {
+  console.log('video success router 실행');
+  videosInfo = await getTenVideoSubtitlesFromLocalBy(
     pageIndex,
     word,
     categories,
+    language,
   );
-});
-
-router.get('/success', (req, res, next) => {
-  if (videoInfo) {
-    res.json({
+  console.log(videosInfo, word, 'success라우터 videoInfo');
+  if (videosInfo) {
+    res.status(200).json({
       result: 'ok',
       searched: {
         word,
-        videoInfo,
+        videosInfo,
       },
     });
   }
