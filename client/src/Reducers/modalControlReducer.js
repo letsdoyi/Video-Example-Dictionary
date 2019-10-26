@@ -1,4 +1,4 @@
-function modalControlReducer(state = false, action) {
+export function modalControlReducer(state = false, action) {
   switch (action.type) {
     case 'READY_TO_SHOW_MODAL':
       return true;

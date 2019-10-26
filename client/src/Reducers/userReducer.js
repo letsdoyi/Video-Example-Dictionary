@@ -1,9 +1,11 @@
+import actionTypes from '../Constants/actionTypes';
 const initialState = null;
+const { LOGIN } = actionTypes;
 
-function userReducer(state = initialState, action) {
+export function userReducer(state = initialState, action) {
   switch (action.type) {
-    case 'LOGIN':
-      return action.data
+    case LOGIN:
+      return action.data;
 
     default:
       return state;
